@@ -1,6 +1,5 @@
 package io.github.jimonreal.urbancomputing;
 
-import android.annotation.SuppressLint;
 import android.app.Activity;
 import android.content.Context;
 import android.hardware.Sensor;
@@ -12,9 +11,10 @@ import android.widget.TextView;
 
 public class InfoActivity extends Activity implements SensorEventListener {
     private SensorManager sensorManager;
-    private final int REPORT_LATENCY_US = 10 * 1000000;
+    private final int REPORT_LATENCY_MS = 10 * 1000;
     private final float[] accelerometerReading = new float[3];
     private TextView accelerometerX;
+    private long prevEventTime;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -23,6 +23,8 @@ public class InfoActivity extends Activity implements SensorEventListener {
         sensorManager = (SensorManager)getSystemService(Context.SENSOR_SERVICE);
 
         accelerometerX = findViewById(R.id.accelerometerXValue);
+
+        prevEventTime = System.currentTimeMillis();
     }
 
     @Override
@@ -33,7 +35,7 @@ public class InfoActivity extends Activity implements SensorEventListener {
         sensorManager.registerListener(this,
                 sensorManager.getDefaultSensor(Sensor.TYPE_ACCELEROMETER),
                 SensorManager.SENSOR_DELAY_NORMAL,
-                REPORT_LATENCY_US);
+                SensorManager.SENSOR_DELAY_UI);
     }
 
     @Override
@@ -46,15 +48,20 @@ public class InfoActivity extends Activity implements SensorEventListener {
 
     @Override
     public void onSensorChanged(SensorEvent sensorEvent) {
-        //We store the values of the accelerometer in our reading vector
-        if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
-            System.arraycopy(sensorEvent.values,
-                    0,
-                    accelerometerReading,
-                    0,
-                    accelerometerReading.length);
+        long now = System.currentTimeMillis();
+        if (Math.abs(now - prevEventTime) >= REPORT_LATENCY_MS) {
+            //We store the values of the accelerometer in our reading vector
+            if (sensorEvent.sensor.getType() == Sensor.TYPE_ACCELEROMETER) {
+                System.arraycopy(sensorEvent.values,
+                        0,
+                        accelerometerReading,
+                        0,
+                        accelerometerReading.length);
+                System.out.println("[" + now + "]: Updating the value: " + String.valueOf(accelerometerReading[0]));
+            }
+            updateActivityScreen();
+            prevEventTime = now;
         }
-        updateActivityScreen();
     }
 
     @Override
@@ -64,6 +71,5 @@ public class InfoActivity extends Activity implements SensorEventListener {
 
     public void updateActivityScreen() {
         accelerometerX.setText(String.valueOf(accelerometerReading[0]));
-        System.out.println("Updating the value");
     }
 }
