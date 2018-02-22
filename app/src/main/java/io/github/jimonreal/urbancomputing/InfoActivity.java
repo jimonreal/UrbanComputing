@@ -33,7 +33,7 @@ public class InfoActivity extends Activity {
     //private AppLocationListener appLocationListener;
     //private LocationManager locationManager;
 
-    private final int REPORT_LATENCY_MS = 1 * 1000;
+    private final int REPORT_LATENCY_MS = 10 * 1000;
     private final float[] rotationMatrix = new float[9];
     private final float[] inclinationMatrix = new float[9];
 
