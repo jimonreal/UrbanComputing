@@ -12,7 +12,7 @@ import java.io.OutputStreamWriter;
  */
 
 public class Log {
-    private static String filename = "LogData-20022018.csv";
+    private static String filename = "LogData-21022018.csv";
 
     public static void sensorDataToCSV(Context context, float[] G, double la, double lo, double al, double ac, float battery, long timestamp) {
         try {
